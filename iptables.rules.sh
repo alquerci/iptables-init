@@ -9,6 +9,27 @@
 # Short-Description: Use iptables-restore to load iptables rules. 
 ### END INIT INFO
 
+function makeroute
+{
+    local prefixaddr=${reseauaddr%.*};
+    local PING="ping -qn -c 1 -W 1";
+    local sufixs="1 254";
+    local passerelle="";
+
+    for sufix in $sufixs;
+    do
+        passerelle="$prefixaddr.$sufix";
+        ${PING} "$passerelle" > /dev/null 2>&1;
+        if [ $? == 0 ];
+        then
+            /sbin/route add default gw "$passerelle" > /dev/null 2>&1;
+            return 0;
+        fi;
+    done;
+
+    return 1;
+};
+
 function iptables_restore
 {
     echo "IPTABLES";
@@ -25,9 +46,9 @@ function iptables_restore
 
     reseauaddr=$(/sbin/route | grep $interface | grep \* | awk '{ print $1 }');
     reseaumask=$(/sbin/route | grep $interface | grep \* | awk '{ print $3 }');
-
     echo -e "\t\tNetwork address:$reseauaddr/$reseaumask";
 
+    makeroute;
 
     echo -ne "\tRestoring rules... ";
 
@@ -91,9 +112,9 @@ COMMIT
         echo "done";
     else
         echo "fail";
-        exit 1;
+        return 1;
     fi;
-
+    return 0;
 };
 
 function iptables_save
