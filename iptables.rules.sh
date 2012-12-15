@@ -1,12 +1,24 @@
 #!/bin/bash
 
-inetaddr=$(/sbin/ifconfig eth0 | grep 'Bcast:' | cut -d: -f2 | awk '{ print $1}');
-bcastaddr=$(/sbin/ifconfig eth0 | grep 'Bcast:' | cut -d: -f3 | awk '{ print $1}');
-interface="eth0";
-reseauaddr=$(/sbin/route | grep \* | awk '{ print $1 }');
-reseaumask=$(/sbin/route | grep \* | awk '{ print $3 }');
+echo "IPTABLES";
+echo -e "\tGet network configuration:";
+
+interface=$(/sbin/ifconfig | cut -d " " -f 1 | grep -m 1 . | awk '{ print $1 }');
+echo -e "\t\tInterface:$interface";
+
+inetaddr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f2 | awk '{ print $1}');
+echo -e "\t\tInet adr:$inetaddr";
+
+bcastaddr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f3 | awk '{ print $1}');
+echo -e "\t\tBcast:$bcastaddr";
+
+reseauaddr=$(/sbin/route | grep $interface | grep \* | awk '{ print $1 }');
+reseaumask=$(/sbin/route | grep $interface | grep \* | awk '{ print $3 }');
+
+echo -e "\t\tNetwork address:$reseauaddr/$reseaumask";
 
 
+echo -ne "\tRestoring rules... ";
 
 echo "
 *filter
@@ -22,9 +34,9 @@ echo "
 -A INPUT -p tcp -j bad_tcp_packets 
 -A INPUT -j local_networks 
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT 
--A INPUT -i eth0 -p udp -j udp_packets 
--A INPUT -i eth0 -p tcp -j tcp_packets 
--A INPUT -i eth0 -p icmp -j icmp_packets 
+-A INPUT -i $interface -p udp -j udp_packets 
+-A INPUT -i $interface -p tcp -j tcp_packets 
+-A INPUT -i $interface -p icmp -j icmp_packets 
 -A INPUT -p igmp -j ACCEPT 
 -A INPUT -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT INPUT packet died: \" --log-level 7 
 -A FORWARD -p tcp -j bad_tcp_packets 
@@ -62,5 +74,13 @@ echo "
 -A udp_packets -d 224.0.0.251/32 -p udp -m udp --dport 5353 -j ACCEPT 
 COMMIT
 " | /sbin/iptables-restore;
+
+if [ $? == 0 ];
+then
+    echo "done";
+else
+    echo "fail";
+    exit 1;
+fi;
 
 exit 0;
