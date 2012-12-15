@@ -1,26 +1,37 @@
 #!/bin/bash
+### BEGIN INIT INFO
+# Provides:          
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Use iptables-restore to load iptables rules. 
+### END INIT INFO
 
-echo "IPTABLES";
-echo -e "\tGet network configuration:";
+function iptables_restore
+{
+    echo "IPTABLES";
+    echo -e "\tGet network configuration:";
 
-interface=$(/sbin/ifconfig | cut -d " " -f 1 | grep -m 1 . | awk '{ print $1 }');
-echo -e "\t\tInterface:$interface";
+    interface=$(/sbin/ifconfig | cut -d " " -f 1 | grep -m 1 . | awk '{ print $1 }');
+    echo -e "\t\tInterface:$interface";
 
-inetaddr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f2 | awk '{ print $1}');
-echo -e "\t\tInet adr:$inetaddr";
+    inetaddr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f2 | awk '{ print $1}');
+    echo -e "\t\tInet adr:$inetaddr";
 
-bcastaddr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f3 | awk '{ print $1}');
-echo -e "\t\tBcast:$bcastaddr";
+    bcastaddr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f3 | awk '{ print $1}');
+    echo -e "\t\tBcast:$bcastaddr";
 
-reseauaddr=$(/sbin/route | grep $interface | grep \* | awk '{ print $1 }');
-reseaumask=$(/sbin/route | grep $interface | grep \* | awk '{ print $3 }');
+    reseauaddr=$(/sbin/route | grep $interface | grep \* | awk '{ print $1 }');
+    reseaumask=$(/sbin/route | grep $interface | grep \* | awk '{ print $3 }');
 
-echo -e "\t\tNetwork address:$reseauaddr/$reseaumask";
+    echo -e "\t\tNetwork address:$reseauaddr/$reseaumask";
 
 
-echo -ne "\tRestoring rules... ";
+    echo -ne "\tRestoring rules... ";
 
-echo "
+    echo "
 *filter
 :INPUT DROP [0:0]
 :FORWARD DROP [0:0]
@@ -75,12 +86,29 @@ echo "
 COMMIT
 " | /sbin/iptables-restore;
 
-if [ $? == 0 ];
-then
-    echo "done";
-else
-    echo "fail";
-    exit 1;
-fi;
+    if [ $? == 0 ];
+    then
+        echo "done";
+    else
+        echo "fail";
+        exit 1;
+    fi;
 
-exit 0;
+};
+
+function iptables_save
+{
+    /sbin/iptables-save > /var/backups/iptables.rules;
+}
+
+case $1 in
+    stop)
+        iptables_save
+    ;;
+    *)
+        iptables_restore
+    ;;
+esac;
+
+
+exit $?;
