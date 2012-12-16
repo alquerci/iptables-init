@@ -1,5 +1,11 @@
 EXEC = iptables-restore-rules.sh
 SRC = iptables.rules.sh
+TESTDIR = tests
+ifndef SHELL_PATH
+  SHELL_PATH = /bin/sh
+endif
+
+export SHELL_PATH TESTDIR SRC
 
 all:
 
@@ -9,3 +15,5 @@ install:
 	install -m 700 $(SRC) /etc/init.d/$(EXEC)
 	update-rc.d $(EXEC) defaults
 	
+test:
+	cd $(TESTDIR) ; $(MAKE)

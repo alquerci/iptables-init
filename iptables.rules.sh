@@ -6,12 +6,52 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # X-Interactive:     true
-# Short-Description: Use iptables-restore to load iptables rules. 
+# Short-Description: Use iptables-restore to load iptables rules.
 ### END INIT INFO
 
-function makeroute
+set_interface()
 {
-    local prefixaddr=${reseauaddr%.*};
+    test ! -z "$interface" && return 0;
+    interface=$(/sbin/ifconfig | cut -d " " -f 1 | grep -m 1 . | awk '{ print $1 }');
+    return $?;
+};
+
+set_network_addr()
+{
+    set_interface || return 1;
+    test ! -z "$network_addr" && return 0;
+    network_addr=$(/sbin/route | grep "$interface" | grep \* | awk '{ print $1 }');
+    return $?;
+};
+
+set_inet_addr()
+{
+    set_interface || return 1
+    test ! -z "$inet_addr" && return 0;
+    inet_addr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f2 | awk '{ print $1}');
+    return $?;
+};
+
+set_bcast_addr()
+{
+    set_interface || return 1;
+    test ! -z "$bcast_addr" && return 0;
+    bcast_addr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f3 | awk '{ print $1}');
+    return $?;
+};
+
+set_network_mask()
+{
+    set_interface || return 1;
+    test ! -z "$network_mask" && return 0;
+    network_mask=$(/sbin/route | grep $interface | grep \* | awk '{ print $3 }');
+    return $?;
+};
+
+insert_default_route()
+{
+    set_network_addr;
+    local prefixaddr="${network_addr%.*}";
     local PING="ping -qn -c 1 -W 1";
     local sufixs="1 254";
     local passerelle="";
@@ -20,7 +60,7 @@ function makeroute
     do
         passerelle="$prefixaddr.$sufix";
         ${PING} "$passerelle" > /dev/null 2>&1;
-        if [ $? == 0 ];
+        if [ "$?" = 0 ];
         then
             /sbin/route add default gw "$passerelle" > /dev/null 2>&1;
             return 0;
@@ -30,25 +70,23 @@ function makeroute
     return 1;
 };
 
-function iptables_restore
+iptables_restore()
 {
     echo "IPTABLES";
     echo -e "\tGet network configuration:";
 
-    interface=$(/sbin/ifconfig | cut -d " " -f 1 | grep -m 1 . | awk '{ print $1 }');
+    set_interface;
     echo -e "\t\tInterface:$interface";
 
-    inetaddr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f2 | awk '{ print $1}');
-    echo -e "\t\tInet adr:$inetaddr";
+    set_inet_addr;
+    echo -e "\t\tInet adr:$inet_addr";
 
-    bcastaddr=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f3 | awk '{ print $1}');
-    echo -e "\t\tBcast:$bcastaddr";
+    set_bcast_addr;
+    echo -e "\t\tBcast:$bcast_addr";
 
-    reseauaddr=$(/sbin/route | grep $interface | grep \* | awk '{ print $1 }');
-    reseaumask=$(/sbin/route | grep $interface | grep \* | awk '{ print $3 }');
-    echo -e "\t\tNetwork address:$reseauaddr/$reseaumask";
-
-    makeroute;
+    set_network_addr;
+    set_network_mask;
+    echo -e "\t\tNetwork address:$network_addr/$network_mask";
 
     echo -ne "\tRestoring rules... ";
 
@@ -79,7 +117,7 @@ function iptables_restore
 -A OUTPUT -s 127.0.0.1/32 -j ACCEPT 
 -A OUTPUT -o $interface -j ACCEPT 
 ### adress reseau ###
--A OUTPUT -s $inetaddr/32 -j ACCEPT 
+-A OUTPUT -s $inet_addr/32 -j ACCEPT 
 #####################
 -A OUTPUT -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT OUTPUT packet died: \" --log-level 7 
 -A allowed -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j ACCEPT 
@@ -93,7 +131,7 @@ function iptables_restore
 -A icmp_packets -p icmp -m limit --limit 50/sec --limit-burst 100 -j LOG --log-prefix \"IPT INPUT others-icmp: \" --log-level 7 
 -A local_networks -i $interface -p udp -m udp --sport 68 --dport 67 -j ACCEPT 
 # address reseau
--A local_networks -s $reseauaddr/$reseaumask -i $interface -j ACCEPT 
+-A local_networks -s $network_addr/$network_mask -i $interface -j ACCEPT 
 -A local_networks -i lo -j ACCEPT 
 -A tcp_packets -p tcp -m tcp --dport 22 -j ACCEPT 
 -A tcp_packets -p tcp -m tcp --dport 80 -j ACCEPT 
@@ -101,35 +139,41 @@ function iptables_restore
 -A tcp_packets -p tcp -m tcp --dport 143 -j ACCEPT 
 -A udp_packets -d 255.255.255.255/32 -p udp -j ACCEPT 
 ### Broadcast adress ###
--A udp_packets -d $bcastaddr/32 -p udp -j ACCEPT 
+-A udp_packets -d $bcast_addr/32 -p udp -j ACCEPT 
 ########################
 -A udp_packets -d 224.0.0.251/32 -p udp -m udp --dport 5353 -j ACCEPT 
 COMMIT
 " | /sbin/iptables-restore;
 
-    if [ $? == 0 ];
+    if [ "$?" = 0 ];
     then
         echo "done";
+        return 0;
     else
         echo "fail";
         return 1;
     fi;
-    return 0;
+    return 1;
 };
 
-function iptables_save
+iptables_save()
 {
     /sbin/iptables-save > /var/backups/iptables.rules;
+    return $?;
 }
 
-case $1 in
+case "$1" in
     stop)
-        iptables_save
+        iptables_save;
+        exit $?;
+    ;;
+    start|restart)
+        iptables_restore;
+        instert_default_route;
+        exit $?;
     ;;
     *)
-        iptables_restore
+        :;
     ;;
 esac;
 
-
-exit $?;
