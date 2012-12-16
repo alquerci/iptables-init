@@ -169,7 +169,7 @@ case "$1" in
     ;;
     start|restart)
         iptables_restore;
-        instert_default_route;
+        insert_default_route;
         exit $?;
     ;;
     *)
