@@ -59,7 +59,7 @@ insert_default_route()
     for sufix in $sufixs;
     do
         passerelle="$prefixaddr.$sufix";
-        ${PING} "$passerelle" > /dev/null 2>&1;
+        ${PING} "$passerelle" > /dev/null ;
         if [ "$?" = 0 ];
         then
             /sbin/route add default gw "$passerelle" > /dev/null 2>&1;
@@ -162,6 +162,8 @@ iptables_save()
     return $?;
 }
 
+SELF_PATH="$_";
+
 case "$1" in
     stop)
         iptables_save;
@@ -173,7 +175,7 @@ case "$1" in
         exit $?;
     ;;
     *)
-        :;
+        echo "usage: $SELF_PATH <start|stop|restart>";
     ;;
 esac;
 

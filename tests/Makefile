@@ -1,6 +1,8 @@
-all: test_makeroute
+TESTS = test_iptables.rules.sh
+
+all: $(TESTS)
 
 .PHONY: FORCE
 
-test_makeroute: FORCE
-	$(SHELL_PATH) ./test_makeroute.sh;
+$(TESTS): FORCE
+	$(SHELL_PATH) ./$@;
