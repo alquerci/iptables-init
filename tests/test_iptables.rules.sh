@@ -2,7 +2,7 @@
 
 oneTimeSetUp()
 {
-    . ../iptables.rules.sh > /dev/null
+    . ${SRC_DIR}/${INIT_D}/functions.h > /dev/null
 };
 
 test_set_interface()

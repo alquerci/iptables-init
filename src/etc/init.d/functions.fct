@@ -1,14 +1,3 @@
-#!/bin/bash
-### BEGIN INIT INFO
-# Provides:          iptables-restore
-# Required-Stop:     $local_fs $remote_fs $network $syslog $named
-# Required-Start:    $local_fs $remote_fs $network $syslog $named
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# X-Interactive:     true
-# Short-Description: Use iptables-restore to load iptables rules.
-### END INIT INFO
-
 set_interface()
 {
     test ! -z "$interface" && return 0;
@@ -160,22 +149,5 @@ iptables_save()
 {
     /sbin/iptables-save > /var/backups/iptables.rules;
     return $?;
-}
-
-SELF_PATH="$_";
-
-case "$1" in
-    stop)
-        iptables_save;
-        exit $?;
-    ;;
-    start|restart)
-        iptables_restore;
-        insert_default_route;
-        exit $?;
-    ;;
-    *)
-        echo "usage: $SELF_PATH <start|stop|restart>";
-    ;;
-esac;
+};
 
