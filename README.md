@@ -1,7 +1,7 @@
 iptables-init
 =============
 
-An useful bash script for auto-restore iptables rules.
+* An useful bash script for auto-restore iptables rules.
 
 REQUIREMENT
 -----------
@@ -13,6 +13,6 @@ REQUIREMENT
 INSTALL
 -------
 
-$ `make`
-$ `sudo PWD=$(pwd) make install`
+* $ `make`
+* $ `sudo PWD=$(pwd) make install`
 
