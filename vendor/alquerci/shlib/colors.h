@@ -33,6 +33,5 @@ __color_init()
 {
     echo -ne '\E[0m';
 }
-
 ### END COLORS ###
 

@@ -1,14 +1,15 @@
 EXEC = iptables-init
 SRC = $(wildcard *.sh)
 OBJ = $(SRC:.sh=.o)
-HEADERS = $(wildcard *.h)
+HEADERS = $(wildcard $(VENDOR_DIR)/alquerci/shlib/*.h) $(wildcard *.h)
 DOCBLOCK = main.doc
-RUNTIME = runtime
+RUNTIME = $(VENDOR_DIR)/alquerci/shlib/runtime
 
 all: $(EXEC)
 
 $(EXEC): $(DOCBLOCK) $(OBJ) $(RUNTIME)
 	$(CAT) $^ > $@
+	$(INSTALL) -m 755 $@ $(BUILD_DIR)/$(INIT_D)
 
 %.o: $(HEADERS) %.sh 
 	$(CAT) $^ > $@

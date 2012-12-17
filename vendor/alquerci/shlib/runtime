@@ -8,38 +8,41 @@ __on_ctrl_c()
 
 __destruct()
 {
-    local e_code = "$?";
-    echo "exit code: $e_code" >&2;
+    E_OUT="$?";
+    echo "exit code: $E_OUT" >&2;
     __color_init;
     rm -r "$TMP_DIR";
-    exit "$e_code";
+    exit "$E_OUT";
 };
 
 trap '__on_ctrl_c' 2;
 trap '__destruct' QUIT TERM EXIT INT KILL SEGV;
 
-__compile "$0";
+SELF_PATH="$0";
+
+__compile "$SELF_PATH";
 
 #> argc="$BASH_ARGC";
 #> argv="$BASH_ARGV";
+
 
 ### START TMP DIRECTORY ###
 TMP_DIR="$(mktemp --tmpdir -d)";
 ### END TMP DIRECTORY ###
 
-if [ ${BASH_ARGV[0]} == "--" ];
+if [ "${BASH_ARGV[0]}" = "--" ];
 then
-    while [ "$e_code" -eq "$E_OK" ];
+    while [ "$E_OUT" -eq "$E_OK" ];
     do
         read text;
         main "$text";
-        e_code="$?";
+        E_OUT="$?";
     done;
 else
     main $@;
 fi;
 
-exit "$e_code";
+exit "$E_OUT";
 
 ### END RUNTIME ###
 

@@ -2,7 +2,7 @@
 
 oneTimeSetUp()
 {
-    . ${SRC_DIR}/${INIT_D}/functions.fct > /dev/null
+    . ${SRC_DIR}/${INIT_D}/*.o > /dev/null
 };
 
 test_set_interface()

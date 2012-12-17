@@ -4,13 +4,13 @@ ifndef PWD
   export BUILD_DIR = build
   export TEST_DIR = tests
   export SRC_DIR = src
+  export VENDOR_DIR = vendor
 else
   export BUILD_DIR = $(PWD)/build
   export TEST_DIR = $(PWD)/tests
   export SRC_DIR = $(PWD)/src
+  export VENDOR_DIR = $(PWD)/vendor
 endif
-
-export EXEC = iptables-init
 
 ### START UNIX tree ###
 export INIT_D = etc/init.d
@@ -29,31 +29,31 @@ export CP = /bin/cp -u
 export RM = /bin/rm -f --preserve-root
 export CAT = /bin/cat -s
 export MV = /bin/mv
+export INSTALL = /usr/bin/install
 
-all: $(EXEC)
+all: $(BUILD_DIR)
 
-$(BUILD_DIR):
-	$(MKDIR) $@
-	@cd $@; $(MKDIR) $(INIT_D)
+$(BUILD_DIR): hasPWD FORCE
+	$(MKDIR) $@/$(INIT_D)
+	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE)
 
-$(EXEC): $(BUILD_DIR) FORCE
+test: $(TEST_DIR) $(BUILD_DIR)
+	@cd $< && $(MAKE)
+
+install: isROOT all test
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
-	$(MV) $(SRC_DIR)/$(INIT_D)/$@ $(BUILD_DIR)/$(INIT_D)/$@
 
-install: isroot all
-	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
-	
-test: all
-	@cd $(TEST_DIR) && $(MAKE)
+isROOT: FORCE
+	@if [ `id -u` != 0 ];then echo "/!\\ You must be root /!\\" >&2; exit 1; fi;
 
-isroot: FORCE
-	@if [ `id -u` != 0 ];then echo "/!\\ You must be root /!\\"; exit 1; fi;
+hasPWD: FORCE
+	@if [ -z "$(PWD)" ];then echo "Need PWD on the environement" >&2; exit 1; fi;
 
-clean:
+clean: hasPWD
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
 	@cd $(TEST_DIR) && $(MAKE) $@
 
-mrproper: clean
+mrproper: hasPWD clean
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
 	@cd $(TEST_DIR) && $(MAKE) $@
 	$(RM) -r $(BUILD_DIR)

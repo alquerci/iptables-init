@@ -8,5 +8,5 @@ __wordno()
 {
     echo -n "$@" | grep -Eo "[^[:blank:]]+" | grep -Ec ".";
 }
-### START UTILS ###
+### END UTILS ###
 

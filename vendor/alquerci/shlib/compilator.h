@@ -20,5 +20,5 @@ __compile()
         exit $E_PARSE;
     fi;
 };
-### START COMPILATOR ###
+### END COMPILATOR ###
 
