@@ -7,8 +7,8 @@ main()
         ;;
         start|restart)
             iptables_restore;
-            insert_default_route;
-            exit $?;
+            oneping "github.com" || insert_default_route;
+            exit "$?";
         ;;
         *)
             echo "usage: $SELF_PATH <start|stop|restart>";
