@@ -43,7 +43,7 @@ oneping()
     local ip="";
     for ip in $@;
     do
-        ${PING} "$ip";
+        ${PING} "$ip" > /dev/null 2>&1;
         if [ "$?" != $E_OK ];
         then
             return "$E_ERROR";
@@ -62,7 +62,7 @@ insert_default_route()
     for sufix in $sufixs;
     do
         passerelle="$prefixaddr.$sufix";
-        oneping "$passerelle" > /dev/null ;
+        oneping "$passerelle";
         if [ "$?" = "$E_OK" ];
         then
             /sbin/route add default gw "$passerelle" > /dev/null 2>&1;
