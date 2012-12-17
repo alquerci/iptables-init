@@ -3,15 +3,15 @@ SRC = $(wildcard *.sh)
 OBJ = $(SRC:.sh=.o)
 HEADERS = $(wildcard *.h)
 DOCBLOCK = main.doc
-FUNCTIONS = $(wildcard *.fct)
+RUNTIME = runtime
 
 all: $(EXEC)
 
-$(EXEC): $(DOCBLOCK) $(HEADERS) $(FUNCTIONS) $(OBJ)
+$(EXEC): $(DOCBLOCK) $(OBJ) $(RUNTIME)
 	$(CAT) $^ > $@
 
-%.o: %.sh
-	$(CAT) $< > $@
+%.o: $(HEADERS) %.sh 
+	$(CAT) $^ > $@
 
 install: $(EXEC)
 	@update-rc.d -f $< remove

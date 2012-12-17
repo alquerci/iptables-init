@@ -28,6 +28,7 @@ export MKDIR = /bin/mkdir -p
 export CP = /bin/cp -u
 export RM = /bin/rm -f --preserve-root
 export CAT = /bin/cat -s
+export MV = /bin/mv
 
 all: $(EXEC)
 
@@ -37,7 +38,7 @@ $(BUILD_DIR):
 
 $(EXEC): $(BUILD_DIR) FORCE
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
-	$(CP) $(SRC_DIR)/$(INIT_D)/$@ $(BUILD_DIR)/$(INIT_D)/$@
+	$(MV) $(SRC_DIR)/$(INIT_D)/$@ $(BUILD_DIR)/$(INIT_D)/$@
 
 install: isroot all
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@

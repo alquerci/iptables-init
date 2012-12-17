@@ -16,5 +16,3 @@ main()
     esac;
 };
 
-main $@;
-
