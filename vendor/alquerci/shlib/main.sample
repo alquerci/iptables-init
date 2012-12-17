@@ -1,55 +1,22 @@
 Main()
 {
-    local argc argv charc out packdir fileList cutpackdir;
-    # charc=$(__strlen $@);
+    local argc argv;
     argc="$BASH_ARGC";
-    argv="$BASH_ARGV"; # array
-    
+    argv="$@";
+
     case "$@" in
-        *-devel)
-            packdir=$(cyg-apt source "$@" > /dev/null);
-            out="$?";if [ "$out" -ne 0 ];then break; fi;
-            
-            cd "$TMP_DIR//$packdir";
-            out="$?";if [ "$out" -ne 0 ];then break; fi;
-            
-            cutpackdir=$(echo "$packdir" | cut -c 3 );
-            out="$?";if [ "$out" -ne 0 ];then break; fi;
-            
-            if ls "$TMP_DIR/$cupackdir"*.tar.gz > /dev/null;
-            then
-                out="$?";if [ "$out" -ne 0 ];then break; fi;
-                fileList="$(tar -ztf "$TMP_DIR/$cupackdir"*.tar.gz)";
-                out="$?";if [ "$out" -ne 0 ];then break; fi;
-            elif ls "$TMP_DIR/$cupackdir"*.tar.bz2 > /dev/null;
-            then
-                out="$?";if [ "$out" -ne 0 ];then break; fi;
-                fileList="$(tar -jtf "$TMP_DIR/$cupackdir"*.tar.bz2)";
-                out="$?";if [ "$out" -ne 0 ];then break; fi;
-            fi
-            
-            if [ $(echo "$fileList" | grep -c "ptrace.h") -gt 0 ];
-            then
-                out="$?";if [ "$out" -ne 0 ];then break; fi;
-                echo "$@";
-            else
-                out="0";
-            fi
-            cd "$TMP_DIR";
-            rm -r "$TMP_DIR/$packdir";
-            ;;
         *EOF)
-            out=$E_EOF;
+            E_OUT=$E_EOF;
             ;;
         "")
-            out=$E_EMPTY;
+            E_OUT=$E_EMPTY;
             ;;
         *)
-            echo -e "line $LINENO - stdout - argv='$@' - argc='$argc'";
-            out=0;
+            echo "HELLO WORLD";
+            E_OUT=0;
             ;;
-    esac
+    esac;
     
-    return "$out";
+    return "$E_OUT";
 };
 

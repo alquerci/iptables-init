@@ -1,9 +1,9 @@
 EXEC = iptables-init
 SRC = $(wildcard *.sh)
 OBJ = $(SRC:.sh=.o)
-HEADERS = $(wildcard $(VENDOR_DIR)/alquerci/shlib/*.h) $(wildcard *.h)
+HEADERS = $(wildcard $(VENDOR_DIR)/alquerci/shlib/src/*.h) $(wildcard *.h)
 DOCBLOCK = main.doc
-RUNTIME = $(VENDOR_DIR)/alquerci/shlib/runtime
+RUNTIME = $(VENDOR_DIR)/alquerci/shlib/src/runtime
 
 all: $(EXEC)
 

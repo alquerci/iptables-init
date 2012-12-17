@@ -30,10 +30,11 @@ export RM = /bin/rm -f --preserve-root
 export CAT = /bin/cat -s
 export MV = /bin/mv
 export INSTALL = /usr/bin/install
+export GIT = /usr/bin/git
 
 all: $(BUILD_DIR)
 
-$(BUILD_DIR): hasPWD FORCE
+$(BUILD_DIR): hasPWD vendor
 	$(MKDIR) $@/$(INIT_D)
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE)
 
@@ -48,6 +49,12 @@ isROOT: FORCE
 
 hasPWD: FORCE
 	@if [ -z "$(PWD)" ];then echo "Need PWD on the environement" >&2; exit 1; fi;
+
+vendor: $(GIT) $(VENDOR_DIR) FORCE
+	@cd $(VENDOR_DIR) && $(MAKE)
+
+$(GIT): FORCE
+	@if [ ! -x "$(GIT)" ];then echo "Need to install git" >&2; exit 1; fi;
 
 clean: hasPWD
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
