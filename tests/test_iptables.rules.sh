@@ -52,10 +52,4 @@ test_set_network_mask()
     assertEquals "code retour" "$?" "0";
 };
 
-test_insert_default_route()
-{
-    insert_default_route;
-    assertEquals "code retour" "$?" "0";
-};
-
 . shunit2;

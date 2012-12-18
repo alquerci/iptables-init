@@ -55,42 +55,6 @@ set_network_mask()
     return $?;
 };
 
-oneping()
-{
-    local PING="ping -qn -c 1 -W 1";
-    local ip="";
-    for ip in $@;
-    do
-        ${PING} "$ip" > /dev/null 2>&1;
-        if [ "$?" != $E_OK ];
-        then
-            return "$E_ERROR";
-        fi;
-    done;
-    return "$E_OK";
-};
-
-insert_default_route()
-{
-    set_network_addr;
-    local prefixaddr="${network_addr%.*}";
-    local sufixs="1 254";
-    local passerelle="";
-
-    for sufix in $sufixs;
-    do
-        passerelle="$prefixaddr.$sufix";
-        oneping "$passerelle";
-        if [ "$?" = "$E_OK" ];
-        then
-            /sbin/route add default gw "$passerelle" > /dev/null 2>&1;
-            return "$E_OK";
-        fi;
-    done;
-
-    return 1;
-};
-
 iptables_restore()
 {
     echo "IPTABLES";

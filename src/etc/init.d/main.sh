@@ -25,7 +25,6 @@ main()
         ;;
         start|restart)
             iptables_restore;
-            oneping "github.com" || insert_default_route;
             exit "$?";
         ;;
         *)
