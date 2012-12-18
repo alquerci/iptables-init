@@ -1,0 +1,9 @@
+language: c
+
+before_script:
+    - sudo apt-get install shunit2 iptables
+
+script:
+    - make test
+    - make mrproper
+
