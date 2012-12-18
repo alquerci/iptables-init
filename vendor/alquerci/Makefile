@@ -17,9 +17,17 @@
 #######################################################################
 
 SHLIB = shlib
-SHLIB_URL = http://github.com/alquerci/shlib.git
+SHLIB_URL = https://github.com/alquerci/shlib.git
 
-$(SHLIB).update:
-	@test -d $(SHLIB) && cd $(SHLIB) && $(GIT) pull $(SHLIB_URL) master || $(GIT) clone $(SHLIB_URL) $(SHLIB)
+REPOSITORIES = $(SHLIB)
 
+all: $(SHLIB)/
+
+$(SHLIB)/:
+	@$(GIT) clone $(SHLIB_URL) $@
+
+mrproper:
+	$(RM) -r $(REPOSITORIES)
+
+.PHONY: mrproper
 

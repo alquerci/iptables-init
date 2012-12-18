@@ -68,7 +68,7 @@ isROOT: FORCE
 hasPWD: FORCE
 	@if [ -z "$(PWD)" ];then echo "Need PWD on the environement" >&2; exit 1; fi;
 
-vendor: $(GIT) $(VENDOR_DIR) FORCE
+vendor: $(VENDOR_DIR) FORCE
 	@cd $(VENDOR_DIR) && $(MAKE)
 
 $(GIT): FORCE
@@ -81,6 +81,7 @@ clean: hasPWD
 mrproper: hasPWD clean
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
 	@cd $(TEST_DIR) && $(MAKE) $@
+	@cd $(VENDOR_DIR) && $(MAKE) $@
 	$(RM) -r $(BUILD_DIR)
 
 .PHONY: FORCE clean mrproper

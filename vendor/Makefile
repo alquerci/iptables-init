@@ -21,5 +21,8 @@ VENDORS = alquerci
 $(VENDORS): FORCE
 	@cd $@ && $(MAKE)
 
-.PHONY: FORCE
+mrproper:
+	@for vendor in $(VENDORS);do cd $$vendor && $(MAKE) $@;done;
+
+.PHONY: FORCE mrproper
 
