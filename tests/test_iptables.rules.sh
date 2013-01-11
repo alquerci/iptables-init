@@ -19,7 +19,7 @@
 
 oneTimeSetUp()
 {
-    . ${SRC_DIR}/${INIT_D}/*.o > /dev/null
+    . ${SD_SRC}/${INIT_D}/*.o > /dev/null
 };
 
 test_set_interface()

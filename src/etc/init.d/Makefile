@@ -16,13 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
-EXEC = iptables-init
-EXEC_PATH = $(BUILD_DIR)/$(INIT_D)/$(EXEC)
+EXENAME ?= iptables-init
+EXEC_PATH = $(SD_BUILD)/$(INIT_D)/$(EXENAME)
 SRC = $(wildcard *.sh)
 OBJ = $(SRC:.sh=.o)
-HEADERS = $(wildcard $(VENDOR_DIR)/alquerci/shlib/src/*.h) $(wildcard *.h)
+HEADERS = $(wildcard $(SD_DIST)/alquerci/shlib/src/*.h) $(wildcard *.h)
 DOCBLOCK = main.doc
-RUNTIME = $(VENDOR_DIR)/alquerci/shlib/src/runtime
+RUNTIME = $(SD_DIST)/alquerci/shlib/src/runtime
 
 all: $(EXEC_PATH)
 
@@ -33,9 +33,9 @@ $(EXEC_PATH): $(DOCBLOCK) $(OBJ) $(RUNTIME)
 	$(CAT) $^ > $@
 
 install: $(EXEC_PATH)
-	@update-rc.d -f $(EXEC) remove
+	@update-rc.d -f $(EXENAME) remove
 	install -m 700 $< /$(INIT_D)
-	@update-rc.d $(EXEC) defaults
+	@update-rc.d $(EXENAME) defaults
 
 clean: FORCE
 	$(RM) *.o

@@ -12,6 +12,7 @@ Requirements
 * iptables
 * git
 * make
+* shunit2
 
 Build
 -----
@@ -28,9 +29,7 @@ Installation
 
 The installation must running into a root account.
 
-$ `make install`
-
-With sudo type `sudo make PWD="$(pwd)" install`
+$ `sudo make install`
 
 TODO
 ----

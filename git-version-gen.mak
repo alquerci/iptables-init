@@ -34,7 +34,9 @@ GVG_DIR ?= vendor/alquerci/git-version-gen
 GVG_PATH = $(GVG_DIR)/src/git-version-gen.sh
 
 $(GVG_FILE): FORCE
-	@$(SHELL_PATH) $(GVG_PATH)
+	@if test -r $(GVG_PATH);then $(SHELL_PATH) $(GVG_PATH);\
+elif test -r version;then echo "VERSION = $(cat version)" > $@;\
+else echo "VERSION = $(VERSION)" > $@;fi;
 -include $(GVG_FILE)
 
 # Version must be generate for each times

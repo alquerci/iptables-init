@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
+GIT ?= /usr/bin/git
+
 VENDORS = alquerci
 
 $(VENDORS): FORCE
@@ -25,4 +27,4 @@ mrproper:
 	@for vendor in $(VENDORS);do cd $$vendor && $(MAKE) $@;done;
 
 .PHONY: FORCE mrproper
-
+.EXPORT_ALL_VARIABLES:

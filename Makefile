@@ -16,78 +16,92 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
-all:
-
-export PREFIX = /usr
-
-ifndef PWD
-  export BUILD_DIR = build
-  export TEST_DIR = tests
-  export SRC_DIR = src
-  export VENDOR_DIR = vendor
-else
-  export BUILD_DIR = $(PWD)/build
-  export TEST_DIR = $(PWD)/tests
-  export SRC_DIR = $(PWD)/src
-  export VENDOR_DIR = $(PWD)/vendor
-endif
-
-### START UNIX tree ###
-export INIT_D = etc/init.d
-### END UNIX tree ###
-
-ifndef SHELL_PATH
-  export SHELL_PATH = /bin/bash
-endif
-
-ifndef MAKE
-  export MAKE = make
-endif
-
-export MKDIR = /bin/mkdir -p
-export CP = /bin/cp -u
-export RM = /bin/rm -f --preserve-root
-export CAT = /bin/cat -s
-export MV = /bin/mv
-export INSTALL = /usr/bin/install
-export GIT = /usr/bin/git
+# Default target
+all::
 
 -include git-version-gen.mak
 
-all: $(BUILD_DIR)
+# vars utils
+UTIL_SPACE := $() #
 
-$(BUILD_DIR): hasPWD vendor
+# Programs
+SHELL_PATH = /bin/sh
+CP = /bin/cp -f
+RM = /bin/rm -f --preserve-root
+MV = /bin/mv
+MKDIR = /bin/mkdir -p
+CAT = /bin/cat
+INSTALL = /bin/install
+GZ = /bin/gzip --best
+TAR = /bin/tar
+PYTHON = /usr/bin/python
+MAKE ?= /usr/bin/make
+GIT = /usr/bin/git
+
+# Source directories
+SD_ROOT = $(subst $(UTIL_SPACE),\$(UTIL_SPACE),$(shell pwd))
+SD_BUILD = $(SD_ROOT)/build
+SD_SRC = $(SD_ROOT)/src
+SD_TEST = $(SD_ROOT)/tests
+SD_DIST = $(SD_ROOT)/vendor
+SD_DOC = $(SD_ROOT)/doc
+SD_TOOLS = $(SD_ROOT)/tools
+
+# source environement
+
+# install environement
+EXENAME = iptables-init
+
+# Install directories
+ID_ROOT = 
+ifdef PREFIX
+  ID_PREFIX := $(PREFIX)
+else
+  ID_PREFIX = usr
+endif
+ID_LOCALSTATE = var
+ID_SYSCONF = etc
+ID_LIBEXEC = $(ID_PREFIX)/lib
+ID_EXEC = $(ID_PREFIX)/bin
+ID_DATA = $(ID_PREFIX)/share
+ID_MAN = $(ID_DATA)/man
+ID_INFO = $(ID_DATA)/info
+
+### START UNIX tree ###
+INIT_D = $(ID_SYSCONF)/init.d
+### END UNIX tree ###
+
+all:: $(SD_BUILD)
+
+$(SD_BUILD): dist 
 	$(MKDIR) $@/$(INIT_D)
-	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE)
+	@cd $(SD_SRC)/$(INIT_D) && $(MAKE)
 
-test: $(TEST_DIR) $(BUILD_DIR)
+test: $(SD_TEST) $(SD_BUILD)
 	@cd $< && $(MAKE)
 
 install: isROOT all test
-	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
+	@cd $(SD_SRC)/$(INIT_D) && $(MAKE) $@
 
 isROOT: FORCE
 	@if [ `id -u` != 0 ];then echo "/!\\ You must be root /!\\" >&2; exit 1; fi;
 
-hasPWD: FORCE
-	@if [ -z "$(PWD)" ];then echo "Need PWD on the environement" >&2; exit 1; fi;
-
-vendor: $(VENDOR_DIR) FORCE
-	@cd $(VENDOR_DIR) && $(MAKE)
+dist: $(SD_DIST) FORCE
+	@cd $(SD_DIST) && $(MAKE)
 
 $(GIT): FORCE
 	@if [ ! -x "$(GIT)" ];then echo "Need to install git" >&2; exit 1; fi;
 
-clean: hasPWD
-	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
-	@cd $(TEST_DIR) && $(MAKE) $@
+clean:
+	@cd $(SD_SRC)/$(INIT_D) && $(MAKE) $@
+	@cd $(SD_TEST) && $(MAKE) $@
 	$(RM) *~
 
-mrproper: hasPWD clean
-	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
-	@cd $(TEST_DIR) && $(MAKE) $@
-	@cd $(VENDOR_DIR) && $(MAKE) $@
-	$(RM) -r $(BUILD_DIR)
+mrproper: clean
+	@cd $(SD_SRC)/$(INIT_D) && $(MAKE) $@
+	@cd $(SD_TEST) && $(MAKE) $@
+	@cd $(SD_DIST) && $(MAKE) $@
+	$(RM) -r $(SD_BUILD)
 
 .PHONY: FORCE clean mrproper
-
+.EXPORT_ALL_VARIABLES:

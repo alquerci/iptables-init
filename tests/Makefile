@@ -18,9 +18,7 @@
 
 TESTS = $(wildcard test*.sh)
 
-ifndef SHELL_PATH
-  SHELL_PATH = /bin/bash
-endif
+SHELL_PATH ?= /bin/bash
 
 all: $(TESTS)
 
