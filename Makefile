@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
+all:
+
 export PREFIX = /usr
 
 ifndef PWD
@@ -50,6 +52,8 @@ export MV = /bin/mv
 export INSTALL = /usr/bin/install
 export GIT = /usr/bin/git
 
+-include git-version-gen.mak
+
 all: $(BUILD_DIR)
 
 $(BUILD_DIR): hasPWD vendor
@@ -77,6 +81,7 @@ $(GIT): FORCE
 clean: hasPWD
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@
 	@cd $(TEST_DIR) && $(MAKE) $@
+	$(RM) *~
 
 mrproper: hasPWD clean
 	@cd $(SRC_DIR)/$(INIT_D) && $(MAKE) $@

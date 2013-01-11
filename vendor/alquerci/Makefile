@@ -19,12 +19,18 @@
 SHLIB = shlib
 SHLIB_URL = https://github.com/alquerci/shlib.git
 
-REPOSITORIES = $(SHLIB)
+GVG = git-version-gen
+GVG_URL = https://github.com/alquerci/git-version-gen.git
 
-all: $(SHLIB)/
+REPOSITORIES = $(SHLIB) $(GVG)
+
+all: $(SHLIB)/ $(GVG)/
 
 $(SHLIB)/:
-	@$(GIT) clone $(SHLIB_URL) $@
+	$(GIT) clone $(SHLIB_URL) $@
+
+$(GVG)/:
+	$(GIT) clone $(GVG_URL) $@
 
 mrproper:
 	$(RM) -r $(REPOSITORIES)
