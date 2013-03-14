@@ -19,8 +19,6 @@
 # Default target
 all::
 
--include git-version-gen.mak
-
 # vars utils
 UTIL_SPACE := $() #
 
@@ -48,6 +46,7 @@ SD_DOC = $(SD_ROOT)/doc
 SD_TOOLS = $(SD_ROOT)/tools
 
 # source environement
+VERSION = $(shell $(SD_ROOT)/git-version-gen.sh)
 
 # install environement
 EXENAME = iptables-init
@@ -73,7 +72,7 @@ INIT_D = $(ID_SYSCONF)/init.d
 
 all:: $(SD_BUILD)
 
-$(SD_BUILD): dist 
+$(SD_BUILD): dist
 	$(MKDIR) $@/$(INIT_D)
 	@cd $(SD_SRC)/$(INIT_D) && $(MAKE)
 

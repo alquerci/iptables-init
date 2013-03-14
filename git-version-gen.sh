@@ -1,3 +1,4 @@
+#!/bin/sh
 ############## GNU GENERAL PUBLIC LICENSE, Version 3 ####################
 # git-version-gen - Tool provides version auto-generation using git tags
 # Copyright (C) 2012 Junio C Hamano <gitster@pobox.com>
@@ -19,27 +20,43 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #########################################################################
 
-SHELL_PATH ?= /bin/sh
+committish=$(git log -n 1 --pretty="%H" "$@" || echo -n "HEAD");
 
-# Use this version if no tag is defined
-export VERSION ?= 0.0.1
+if [ -z "$VERSION" ];
+then
+    VERSION="0.0.1";
+fi
 
-# file auto-generate containing the macro VERSION to be included into the Makefile
-export GVG_FILE ?= GVG-VERSION~
-
-# Directory to auto generator script
-GVG_DIR ?= vendor/alquerci/git-version-gen
-
-# Path to auto generator script
-GVG_PATH = $(GVG_DIR)/src/git-version-gen.sh
-
-$(GVG_FILE): FORCE
-	@if test -r $(GVG_PATH);then $(SHELL_PATH) $(GVG_PATH);\
-elif test -r version;then echo "VERSION = $(cat version)" > $@;\
-else echo "VERSION = $(VERSION)" > $@;fi;
--include $(GVG_FILE)
-
-# Version must be generate for each times
-.PHONY: FORCE
+LF='
+'
 
 
+# First see if there is a version file (included in release tarballs),
+# then try git-describe, then default.
+if test -f version
+then
+    VN=$(cat version) || VN="$VERSION"
+elif test -d .git -o -f .git &&
+    VN=$(git describe --match "v[0-9]*" --tags --abbrev=7 $committish 2>/dev/null) &&
+    case "$VN" in
+        *$LF*) (exit 1) ;;
+        v[0-9]*)
+            git update-index -q --refresh
+            test -z "$(git diff-index --name-only $committish --)" ||
+            VN="$VN-dirty" ;;
+    esac
+then
+    VN=$(echo "$VN" | sed -e 's/-/./g');
+else
+    VN="$VERSION"
+fi
+
+VN=$(expr "$VN" : v*'\(.*\)')
+
+# Remove prefix v
+VN="${VN#v}";
+
+# send the version to the stdout
+echo "$VN";
+
+exit 0;
