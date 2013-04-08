@@ -27,7 +27,7 @@ RUNTIME = $(SD_DIST)/alquerci/shlib/src/runtime
 all: $(EXEC_PATH)
 
 $(EXEC_PATH): $(DOCBLOCK) $(OBJ) $(RUNTIME)
-	echo -e "#\n# version: $(VERSION)\n#" | $(CAT) $(DOCBLOCK) - $(OBJ) $(RUNTIME) > $@
+	echo "#\n# version: $(VERSION)\n#" | $(CAT) $(DOCBLOCK) - $(OBJ) $(RUNTIME) > $@
 
 %.o: $(HEADERS) %.sh 
 	$(CAT) $^ > $@
