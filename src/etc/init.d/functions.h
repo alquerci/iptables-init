@@ -18,8 +18,20 @@
 
 set_interface()
 {
+    local interfaces=;
+    local interface_check=;
+
     test ! -z "$interface" && return 0;
-    interface=$(/sbin/ifconfig | cut -d " " -f 1 | grep -m 1 . | awk '{ print $1 }');
+
+    interfaces=$(/sbin/ifconfig | cut -d " " -f 1 | grep .);
+
+    for interface_check in $interfaces; do
+        if [ ! -z "$(/sbin/ifconfig $interface_check | grep 'Bcast:')" ]; then
+            break;
+        fi;
+    done;
+
+    interface=$(echo "$interface_check" | awk '{ print $1 }');
     return $?;
 };
 

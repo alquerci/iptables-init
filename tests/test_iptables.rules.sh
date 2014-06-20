@@ -26,30 +26,35 @@ test_set_interface()
 {
     set_interface;
     assertEquals "code retour" "$?" "0";
+    assertNotNull "The variable 'interface' was assigned" "$interface"
 };
 
 test_set_network_addr()
 {
     set_network_addr;
     assertEquals "code retour" "$?" "0";
+    assertNotNull "The variable 'network_addr' was assigned" "$network_addr"
 };
 
 test_set_inet_addr()
 {
     set_inet_addr;
     assertEquals "code retour" "$?" "0";
+    assertNotNull "The variable 'inet_addr' was assigned" "$inet_addr"
 };
 
 test_set_bcast_addr()
 {
     set_bcast_addr;
     assertEquals "code retour" "$?" "0";
+    assertNotNull "The variable 'bcast_addr' was assigned" "$bcast_addr"
 };
 
 test_set_network_mask()
 {
     set_network_mask;
     assertEquals "code retour" "$?" "0";
+    assertNotNull "The variable 'network_mask' was assigned" "$network_mask"
 };
 
 . shunit2;
