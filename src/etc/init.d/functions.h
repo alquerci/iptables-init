@@ -38,8 +38,9 @@ set_interface()
 set_network_addr()
 {
     set_interface || return 1;
+    set_network_mask || return 1;
     test ! -z "$network_addr" && return 0;
-    network_addr=$(/sbin/route | grep "$interface" | grep \* | awk '{ print $1 }');
+    network_addr=$(/sbin/route | grep "$interface" | grep \* | grep -m 1 "$network_mask" | awk '{ print $1 }');
     return $?;
 };
 
@@ -63,7 +64,7 @@ set_network_mask()
 {
     set_interface || return 1;
     test ! -z "$network_mask" && return 0;
-    network_mask=$(/sbin/route | grep $interface | grep \* | awk '{ print $3 }');
+    network_mask=$(/sbin/ifconfig $interface | grep 'Bcast:' | cut -d: -f4 | awk '{ print $1}');
     return $?;
 };
 
