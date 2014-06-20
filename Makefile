@@ -82,6 +82,9 @@ test: $(SD_TEST) $(SD_BUILD)
 install: isROOT all test
 	@cd $(SD_SRC)/$(INIT_D) && $(MAKE) $@
 
+uninstall: isROOT
+	@cd $(SD_SRC)/$(INIT_D) && $(MAKE) $@
+
 isROOT: FORCE
 	@if [ `id -u` != 0 ];then echo "/!\\ You must be root /!\\" >&2; exit 1; fi;
 

@@ -31,6 +31,11 @@ The installation must running into a root account.
 
 $ `sudo make install`
 
+It's also possible to uninstall it by running.
+
+$ `sudo make uninstall`
+
+
 TODO
 ----
 

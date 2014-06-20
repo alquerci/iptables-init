@@ -32,10 +32,12 @@ $(EXEC_PATH): $(DOCBLOCK) $(OBJ) $(RUNTIME)
 %.o: $(HEADERS) %.sh 
 	$(CAT) $^ > $@
 
-install: $(EXEC_PATH)
-	@update-rc.d -f $(EXENAME) remove
+install: $(EXEC_PATH) uninstall
 	install -m 700 $< /$(INIT_D)
 	@update-rc.d $(EXENAME) defaults
+
+uninstall:
+	@update-rc.d -f $(EXENAME) remove
 
 clean: FORCE
 	$(RM) *.o
