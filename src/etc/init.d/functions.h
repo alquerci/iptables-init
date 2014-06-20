@@ -27,12 +27,15 @@ set_interface()
 
     for interface_check in $interfaces; do
         if [ ! -z "$(/sbin/ifconfig $interface_check | grep 'Bcast:')" ]; then
-            break;
+            interface=$(echo "$interface_check" | awk '{ print $1 }');
+
+            return 0;
         fi;
     done;
 
-    interface=$(echo "$interface_check" | awk '{ print $1 }');
-    return $?;
+    echo 2>&1 "Cannot detect an availble network interface.";
+
+    return 1;
 };
 
 set_network_addr()
@@ -73,17 +76,17 @@ iptables_restore()
     echo "IPTABLES";
     echo -e "\tGet network configuration:";
 
-    set_interface;
+    set_interface || return 1;
     echo -e "\t\tInterface:$interface";
 
-    set_inet_addr;
+    set_inet_addr || return 1;
     echo -e "\t\tInet adr:$inet_addr";
 
-    set_bcast_addr;
+    set_bcast_addr || return 1;
     echo -e "\t\tBcast:$bcast_addr";
 
-    set_network_addr;
-    set_network_mask;
+    set_network_addr || return 1;
+    set_network_mask || return 1;
     echo -e "\t\tNetwork address:$network_addr/$network_mask";
 
     echo -ne "\tRestoring rules... ";
