@@ -27,6 +27,10 @@ main()
             iptables_restore;
             exit "$?";
         ;;
+        init)
+            iptables_init;
+            exit "$?";
+        ;;
         *)
             echo "usage: $SELF_PATH <start|stop|restart>";
         ;;
