@@ -36,6 +36,12 @@ It's also possible to uninstall it by running.
 $ `sudo make uninstall`
 
 
+Files
+-----
+
+`/var/backups/iptables.rules`: Path used to save rules.
+
+
 TODO
 ----
 

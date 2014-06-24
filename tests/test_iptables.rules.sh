@@ -20,6 +20,14 @@
 oneTimeSetUp()
 {
     . ${SD_SRC}/${INIT_D}/*.o > /dev/null
+
+    test_rules_path="/tmp/iptables-init.rules";
+    touch "$test_rules_path";
+};
+
+oneTimeTearDown()
+{
+    rm --preserve-root "$test_rules_path";
 };
 
 test_set_interface()
@@ -55,6 +63,21 @@ test_set_network_mask()
     set_network_mask;
     assertEquals "code retour" "$?" "0";
     assertNotNull "The variable 'network_mask' was assigned" "$network_mask"
+};
+
+test_set_rules_path()
+{
+    set_rules_path;
+    assertEquals "code retour" "$?" "0";
+    assertNotNull "The variable 'rules_path' was assigned" "$rules_path"
+};
+
+test_iptables_init()
+{
+    rules_path="$test_rules_path";
+    iptables_init;
+    assertEquals "code retour" "$?" "0";
+    assertNotNull "Rules file is not empty" "$(cat "$rules_path")"
 };
 
 . shunit2;

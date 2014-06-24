@@ -71,7 +71,15 @@ set_network_mask()
     return $?;
 };
 
-iptables_restore()
+set_rules_path()
+{
+    test ! -z "$rules_path" && return 0;
+
+    rules_path="/var/backups/iptables.rules";
+    return $?;
+};
+
+iptables_init()
 {
     echo "IPTABLES";
     echo -e "\tGet network configuration:";
@@ -89,7 +97,7 @@ iptables_restore()
     set_network_mask || return 1;
     echo -e "\t\tNetwork address:$network_addr/$network_mask";
 
-    echo -ne "\tRestoring rules... ";
+    set_rules_path || return 1;
 
     echo "
 *filter
@@ -144,22 +152,39 @@ iptables_restore()
 ########################
 -A udp_packets -d 224.0.0.251/32 -p udp -m udp --dport 5353 -j ACCEPT 
 COMMIT
-" | /sbin/iptables-restore;
+" > "$rules_path";
 
-    if [ "$?" = 0 ];
-    then
+    echo "Rules saved into: '$rules_path'";
+
+    return $?;
+};
+
+iptables_restore()
+{
+    set_rules_path || return 1;
+
+    if [ ! -f "$rules_path" ]; then
+        iptables_init;
+    fi;
+
+    echo -ne "IPTABLES - Restoring rules from '$rules_path' ... ";
+
+    cat "$rules_path" | /sbin/iptables-restore;
+
+    if [ "$?" = 0 ]; then
         echo "done";
         return 0;
-    else
-        echo "fail";
-        return 1;
     fi;
+
+    echo "fail";
     return 1;
 };
 
 iptables_save()
 {
-    /sbin/iptables-save > /var/backups/iptables.rules;
+    set_rules_path || return 1;
+
+    /sbin/iptables-save > "$rules_path";
     return $?;
 };
 
