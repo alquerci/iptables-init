@@ -1,17 +1,17 @@
 ############## GNU GENERAL PUBLIC LICENSE, Version 3 #################
 # iptables-init - Bash script for auto-restore iptables rules
 # Copyright (C) 2012 Alexandre Quercia
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
@@ -133,47 +133,47 @@ iptables_init()
 :local_networks - [0:0]
 :tcp_packets - [0:0]
 :udp_packets - [0:0]
--A INPUT -p tcp -j bad_tcp_packets 
--A INPUT -j local_networks 
--A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT 
--A INPUT -i $interface -p udp -j udp_packets 
--A INPUT -i $interface -p tcp -j tcp_packets 
--A INPUT -i $interface -p icmp -j icmp_packets 
--A INPUT -p igmp -j ACCEPT 
--A INPUT -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT INPUT packet died: \" --log-level 7 
--A FORWARD -p tcp -j bad_tcp_packets 
--A FORWARD -i $interface -j ACCEPT 
--A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT 
--A FORWARD -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT FORWARD packet died: \" --log-level 7 
--A OUTPUT -p tcp -j bad_tcp_packets 
--A OUTPUT -s 127.0.0.1/32 -j ACCEPT 
--A OUTPUT -o $interface -j ACCEPT 
+-A INPUT -p tcp -j bad_tcp_packets
+-A INPUT -j local_networks
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i $interface -p udp -j udp_packets
+-A INPUT -i $interface -p tcp -j tcp_packets
+-A INPUT -i $interface -p icmp -j icmp_packets
+-A INPUT -p igmp -j ACCEPT
+-A INPUT -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT INPUT packet died: \" --log-level 7
+-A FORWARD -p tcp -j bad_tcp_packets
+-A FORWARD -i $interface -j ACCEPT
+-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT FORWARD packet died: \" --log-level 7
+-A OUTPUT -p tcp -j bad_tcp_packets
+-A OUTPUT -s 127.0.0.1/32 -j ACCEPT
+-A OUTPUT -o $interface -j ACCEPT
 ### adress reseau ###
--A OUTPUT -s $inet_addr/32 -j ACCEPT 
+-A OUTPUT -s $inet_addr/32 -j ACCEPT
 #####################
--A OUTPUT -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT OUTPUT packet died: \" --log-level 7 
--A allowed -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j ACCEPT 
--A allowed -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT 
--A allowed -p tcp -j DROP 
--A bad_tcp_packets -p tcp -m tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset 
--A bad_tcp_packets -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT New not syn: \" 
--A bad_tcp_packets -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j DROP 
--A icmp_packets -p icmp -m icmp --icmp-type 8 -j ACCEPT 
--A icmp_packets -p icmp -m icmp --icmp-type 11 -j ACCEPT 
--A icmp_packets -p icmp -m limit --limit 50/sec --limit-burst 100 -j LOG --log-prefix \"IPT INPUT others-icmp: \" --log-level 7 
--A local_networks -i $interface -p udp -m udp --sport 68 --dport 67 -j ACCEPT 
+-A OUTPUT -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT OUTPUT packet died: \" --log-level 7
+-A allowed -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j ACCEPT
+-A allowed -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A allowed -p tcp -j DROP
+-A bad_tcp_packets -p tcp -m tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
+-A bad_tcp_packets -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -m limit --limit 3/min --limit-burst 3 -j LOG --log-prefix \"IPT New not syn: \"
+-A bad_tcp_packets -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j DROP
+-A icmp_packets -p icmp -m icmp --icmp-type 8 -j ACCEPT
+-A icmp_packets -p icmp -m icmp --icmp-type 11 -j ACCEPT
+-A icmp_packets -p icmp -m limit --limit 50/sec --limit-burst 100 -j LOG --log-prefix \"IPT INPUT others-icmp: \" --log-level 7
+-A local_networks -i $interface -p udp -m udp --sport 68 --dport 67 -j ACCEPT
 # address reseau
--A local_networks -s $network_addr/$network_mask -i $interface -j ACCEPT 
--A local_networks -i lo -j ACCEPT 
--A tcp_packets -p tcp -m tcp --dport 22 -j ACCEPT 
--A tcp_packets -p tcp -m tcp --dport 80 -j ACCEPT 
--A tcp_packets -p tcp -m tcp --dport 443 -j ACCEPT 
--A tcp_packets -p tcp -m tcp --dport 143 -j ACCEPT 
--A udp_packets -d 255.255.255.255/32 -p udp -j ACCEPT 
+-A local_networks -s $network_addr/$network_mask -i $interface -j ACCEPT
+-A local_networks -i lo -j ACCEPT
+-A tcp_packets -p tcp -m tcp --dport 22 -j ACCEPT
+-A tcp_packets -p tcp -m tcp --dport 80 -j ACCEPT
+-A tcp_packets -p tcp -m tcp --dport 443 -j ACCEPT
+-A tcp_packets -p tcp -m tcp --dport 143 -j ACCEPT
+-A udp_packets -d 255.255.255.255/32 -p udp -j ACCEPT
 ### Broadcast adress ###
--A udp_packets -d $bcast_addr/32 -p udp -j ACCEPT 
+-A udp_packets -d $bcast_addr/32 -p udp -j ACCEPT
 ########################
--A udp_packets -d 224.0.0.251/32 -p udp -m udp --dport 5353 -j ACCEPT 
+-A udp_packets -d 224.0.0.251/32 -p udp -m udp --dport 5353 -j ACCEPT
 COMMIT
 " > "$rules_path";
 
