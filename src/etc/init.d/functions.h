@@ -16,6 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
+##
+# Sets an interface name into $interface.
+#
 set_interface()
 {
     local interfaces=;
@@ -38,6 +41,9 @@ set_interface()
     return 1;
 };
 
+##
+# Sets a network address into $network_addr.
+#
 set_network_addr()
 {
     set_interface || return 1;
@@ -47,6 +53,9 @@ set_network_addr()
     return $?;
 };
 
+##
+# Sets an inet address into $inet_addr.
+#
 set_inet_addr()
 {
     set_interface || return 1
@@ -55,6 +64,9 @@ set_inet_addr()
     return $?;
 };
 
+##
+# Sets a broadcast address into $bcast_addr.
+#
 set_bcast_addr()
 {
     set_interface || return 1;
@@ -63,6 +75,9 @@ set_bcast_addr()
     return $?;
 };
 
+##
+# Sets a network mask into $network_mask.
+#
 set_network_mask()
 {
     set_interface || return 1;
@@ -71,6 +86,9 @@ set_network_mask()
     return $?;
 };
 
+##
+# Sets path of the backup rules files into $rules_path.
+#
 set_rules_path()
 {
     test ! -z "$rules_path" && return 0;
@@ -79,6 +97,11 @@ set_rules_path()
     return $?;
 };
 
+##
+# Initialize all iptables rules.
+#
+# Determine and save into $rules_path all rules with the current network config.
+#
 iptables_init()
 {
     echo "IPTABLES";
@@ -159,6 +182,11 @@ COMMIT
     return $?;
 };
 
+##
+# Restore rules from $rules_path.
+#
+# Require root access.
+#
 iptables_restore()
 {
     set_rules_path || return 1;
@@ -180,6 +208,11 @@ iptables_restore()
     return 1;
 };
 
+##
+# Save current iptables rules into $rules_path.
+#
+# Require root access.
+#
 iptables_save()
 {
     set_rules_path || return 1;
