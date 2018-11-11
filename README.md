@@ -5,6 +5,11 @@ iptables-init
 
 An useful bash script for auto-restore iptables rules.
 
+Deprecation
+-----------
+
+This tool is deprecated please use the debian/ubuntu package [iptables-persistant][2] instead.
+
 Requirements
 ------------
 
@@ -50,3 +55,4 @@ TODO
 
 [0]: https://travis-ci.org/alquerci/iptables-init.png?branch=master
 [1]: https://travis-ci.org/alquerci/iptables-init
+[2]: https://launchpad.net/ubuntu/+source/iptables-persistent
